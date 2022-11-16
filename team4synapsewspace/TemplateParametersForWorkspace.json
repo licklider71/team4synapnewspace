@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "team4synapsewspace"
+		},
+		"team4synapsewspace-WorkspaceDefaultSqlServer_connectionString": {
+			"value": ""
+		},
+		"team4synapsewspace-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://adls2team4.dfs.core.windows.net"
+		}
+	}
+}
