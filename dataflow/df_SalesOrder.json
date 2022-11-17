@@ -1,0 +1,122 @@
+{
+	"name": "df_SalesOrder",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SouthridgeCloudSales",
+						"type": "DatasetReference"
+					},
+					"name": "OrderDetails"
+				},
+				{
+					"dataset": {
+						"referenceName": "SouthridgeCloudSales",
+						"type": "DatasetReference"
+					},
+					"name": "Orders"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DvdSales",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "Transformation"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          OrderDetailID as string,",
+				"          OrderID as string,",
+				"          MovieID as string,",
+				"          Quantity as short,",
+				"          UnitCost as double,",
+				"          LineNumber as short,",
+				"          CreatedDate as string,",
+				"          UpdatedDate as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> OrderDetails",
+				"source(output(",
+				"          OrderID as string,",
+				"          CustomerID as string,",
+				"          OrderDate as string,",
+				"          ShipDate as string,",
+				"          TotalCost as double,",
+				"          CreatedDate as string,",
+				"          UpdatedDate as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Orders",
+				"Orders select(mapColumn(",
+				"          OrderID,",
+				"          CustomerID,",
+				"          OrderDate,",
+				"          ShipDate,",
+				"          TotalCost,",
+				"          CreatedDate,",
+				"          UpdatedDate",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"OrderDetails select(mapColumn(",
+				"          OrderDetailID,",
+				"          OrderID,",
+				"          MovieID,",
+				"          Quantity,",
+				"          UnitCost,",
+				"          LineNumber,",
+				"          CreatedDate,",
+				"          UpdatedDate",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"Orders, OrderDetails join(Orders@OrderID == OrderDetails@OrderID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 derive(SourceID = \"1\",",
+				"          UniqueOrderID = concat(\"1\",OrderDetailID),",
+				"          UniqueMovieID = concat(\"1\", MovieID),",
+				"          UniqueCustomerID = concat(\"1\",CustomerID),",
+				"          TotalCost = toFloat(TotalCost),",
+				"          UnitCost = toFloat(UnitCost),",
+				"          OrderDate = toTimestamp(OrderDate,'yyyy-MM-dd HH:mm:ss'),",
+				"          ShipDate = toTimestamp(ShipDate,'yyyy-MM-dd HH:mm:ss'),",
+				"          Quantity = toInteger(Quantity),",
+				"          LineNumber = toInteger(LineNumber)) ~> Transformation",
+				"Transformation sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['DvdSales.csv'],",
+				"     truncate: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

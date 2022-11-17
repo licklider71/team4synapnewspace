@@ -1,0 +1,17 @@
+{
+	"name": "DestinationDataset_j6r",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Actors"
+		},
+		"sqlPool": {
+			"referenceName": "team4",
+			"type": "SqlPoolReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
