@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "team4synapsewspace"
+		},
+		"AzureSynapse_connectionString": {
+			"value": ""
+		},
+		"LSCloudSales_connectionString": {
+			"value": ""
+		},
+		"LSCloudStreaming_connectionString": {
+			"value": ""
+		},
+		"LSFourthCoffeenew_password": {
+			"value": ""
+		},
+		"LSFourthcoffeefile_password": {
+			"value": ""
+		},
+		"LSVanArsedelsql_connectionString": {
+			"value": ""
+		},
+		"LSmovies_connectionString": {
+			"value": ""
+		},
+		"team4synapsewspace-WorkspaceDefaultSqlServer_connectionString": {
+			"value": ""
+		},
+		"LSFourthCoffeenew_properties_typeProperties_host": {
+			"value": "\\\\FourthCoffee\\CDrive"
+		},
+		"LSFourthCoffeenew_properties_typeProperties_userId": {
+			"value": "southridge"
+		},
+		"LSFourthcoffeefile_properties_typeProperties_host": {
+			"value": "\\\\FourthCoffee\\C"
+		},
+		"LSFourthcoffeefile_properties_typeProperties_userId": {
+			"value": "southridge"
+		},
+		"team4synapsewspace-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://adls2team4.dfs.core.windows.net"
+		}
+	}
+}
