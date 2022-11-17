@@ -1,0 +1,25 @@
+{
+	"name": "SourceDataset_j6r",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "team4synapsewspace-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Actors.csv",
+				"folderPath": "fourthcoffee",
+				"fileSystem": "rawteam4"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

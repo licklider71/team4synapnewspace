@@ -1,0 +1,19 @@
+{
+	"name": "Fourthcoffee",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "team4synapsewspace-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "fourthcoffee",
+				"fileSystem": "rawteam4"
+			}
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

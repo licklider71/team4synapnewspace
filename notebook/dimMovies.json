@@ -1,0 +1,698 @@
+{
+	"name": "dimMovies",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "ApachePool1",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 1,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "true",
+				"spark.dynamicAllocation.minExecutors": "1",
+				"spark.dynamicAllocation.maxExecutors": "4",
+				"spark.autotune.trackingId": "af02c0a1-5f89-43b5-acd8-441f3eaccccd"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b9a8b22f-7693-4f61-b656-8b2dcc6b6074/resourceGroups/MDWOHRG/providers/Microsoft.Synapse/workspaces/team4synapsewspace/bigDataPools/ApachePool1",
+				"name": "ApachePool1",
+				"type": "Spark",
+				"endpoint": "https://team4synapsewspace.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/ApachePool1",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"import pandas as pd"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Read in movies csv from fourth coffee\r\n",
+					"data_path = spark.read.load('abfss://rawteam4@adls2team4.dfs.core.windows.net/fourthcoffee/Movies.csv', format='csv', header=True)\r\n",
+					"\r\n",
+					"fourth_coffee_df = data_path.toPandas()\r\n",
+					"fourth_coffee_df['DataSource'] = 'Fourth Coffee'\r\n",
+					"fourth_coffee_df.head()"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"# Read in movies csv from van arsdel\r\n",
+					"data_path = spark.read.load('abfss://rawteam4@adls2team4.dfs.core.windows.net/vanarsdel/dboMovies.txt', format='text', header=True)\r\n",
+					"\r\n",
+					"van_arsdel_df = data_path.toPandas()\r\n",
+					"van_arsdel_df['DataSource'] = 'Van Arsdel'\r\n",
+					"van_arsdel_df.head()"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Read in movies csv from van arsdel\r\n",
+					"data_path = spark.read.load('abfss://rawteam4@adls2team4.dfs.core.windows.net/vanarsdel/dboActors.txt', format='text', header=True)\r\n",
+					"\r\n",
+					"van_arsdel_df = data_path.toPandas()\r\n",
+					"van_arsdel_df['DataSource'] = 'Van Arsdel1'\r\n",
+					"van_arsdel_df.head()"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"# Read in movies csv from van arsdel\r\n",
+					"data_path = spark.read.load('abfss://rawteam4@adls2team4.dfs.core.windows.net/southridge/movies/data_3f52b042-9b0f-4ac6-80fb-33bee16fe616_250100c9-965a-4ac2-8941-d45f5b33073f.json', format='json')\r\n",
+					"\r\n",
+					"cosmos_df = data_path.toPandas()\r\n",
+					"cosmos_df['DataSource'] = 'Southridge'\r\n",
+					"cosmos_df.head()"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_df1 = fourth_coffee_df.append(van_arsdel_df, sort=False)\r\n",
+					"movies_df = movies_df1.append(cosmos_df, sort=False)\r\n",
+					"movies_df['Category'] = movies_df['Category'].fillna(movies_df['genre'])\r\n",
+					"movies_df['Rating'] = movies_df['Rating'].fillna(movies_df['rating'])\r\n",
+					"movies_df['RunTimeMin'] = movies_df['RunTimeMin'].fillna(movies_df['runtime'])\r\n",
+					"movies_df['MovieTitle'] = movies_df['MovieTitle'].fillna(movies_df['title'])\r\n",
+					"movies_df['MovieID'] = movies_df['MovieID'].fillna(movies_df['id'])\r\n",
+					"movies_df['Rating'] = movies_df['Rating'].replace('PG=13','PG-13')\r\n",
+					"movies_df.head()"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Create Categories Dimension Table"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"categories_df_dedupe = movies_df[['Category']].drop_duplicates()\r\n",
+					"len(categories_df_dedupe)"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"categories_df_dedupe = categories_df_dedupe.reset_index(drop=True).reset_index()\r\n",
+					"categories_df_dedupe.head(10)"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"categories_sparkdf = spark.createDataFrame(categories_df_dedupe)\r\n",
+					"categories_sparkdf = categories_sparkdf.coalesce(1)\r\n",
+					"categories_sparkdf.write.option(\"header\",\"true\").mode(\"OVERWRITE\").csv('abfss://rawteam4@adls2team4.dfs.core.windows.net/conformed/Categories')\r\n",
+					""
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Create Ratings Dimension Table"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"ratings_df_dedupe = movies_df[['Rating']].drop_duplicates()\r\n",
+					"len(ratings_df_dedupe)"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"ratings_df_dedupe = ratings_df_dedupe.reset_index(drop=True).reset_index()\r\n",
+					"ratings_df_dedupe.head()"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"ratings_sparkdf = spark.createDataFrame(ratings_df_dedupe)\r\n",
+					"ratings_sparkdf = ratings_sparkdf.coalesce(1)\r\n",
+					"ratings_sparkdf.write.option(\"header\",\"true\").mode(\"OVERWRITE\").csv('abfss://rawteam4@adls2team4.dfs.core.windows.net/conformed/Ratings')"
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Create Movies Dimension Table"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"print (len(fourth_coffee_df))\r\n",
+					"print (len(van_arsdel_df))\r\n",
+					"print (len(cosmos_df))\r\n",
+					"print (len(movies_df))"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_df_dedupe = movies_df[['MovieID','MovieTitle','Category','Rating','RunTimeMin']].drop_duplicates()\r\n",
+					"print(len(movies_df_dedupe))"
+				],
+				"execution_count": 19
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_df_dedupe.isnull().sum()"
+				],
+				"execution_count": 20
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_df_dedupe.head()"
+				],
+				"execution_count": 21
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_df_dedupe = movies_df_dedupe.reset_index()"
+				],
+				"execution_count": 22
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_df_dedupe.head()"
+				],
+				"execution_count": 23
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_df_dedupe_sk = pd.merge(movies_df_dedupe, categories_df_dedupe, on='Category', how='left')\r\n",
+					"movies_df_dedupe_sk = movies_df_dedupe_sk.drop('Category', axis=1)\r\n",
+					"movies_df_dedupe_sk = movies_df_dedupe_sk.rename(columns={'index_y':'MovieCategorySK'})\r\n",
+					"movies_df_dedupe_sk.head()"
+				],
+				"execution_count": 24
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_df_dedupe_sk = pd.merge(movies_df_dedupe_sk, ratings_df_dedupe, on='Rating', how='left')\r\n",
+					"movies_df_dedupe_sk = movies_df_dedupe_sk.drop('Rating', axis=1)\r\n",
+					"movies_df_dedupe_sk = movies_df_dedupe_sk.rename(columns={'index':'MovieRatingSK'})\r\n",
+					"movies_df_dedupe_sk = movies_df_dedupe_sk.rename(columns={'index_x':'MovieSK'})\r\n",
+					"movies_df_dedupe_sk.head()"
+				],
+				"execution_count": 25
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_df_dedupe_sk['MovieSK'] = movies_df_dedupe_sk['MovieSK'].astype(int)\r\n",
+					"movies_df_dedupe_sk['MovieID'] = movies_df_dedupe_sk['MovieID'].astype(str)\r\n",
+					"movies_df_dedupe_sk['MovieTitle'] = movies_df_dedupe_sk['MovieTitle'].astype(str)\r\n",
+					"movies_df_dedupe_sk['MovieCategorySK'] = movies_df_dedupe_sk['MovieCategorySK'].astype(int)\r\n",
+					"movies_df_dedupe_sk['MovieRatingSK'] = movies_df_dedupe_sk['MovieRatingSK'].astype(int)\r\n",
+					"movies_df_dedupe_sk['RunTimeMin'] = movies_df_dedupe_sk['RunTimeMin'].astype(float)"
+				],
+				"execution_count": 26
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_sparkdf = spark.createDataFrame(movies_df_dedupe_sk) "
+				],
+				"execution_count": 27
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_sparkdf = movies_sparkdf.coalesce(1)"
+				],
+				"execution_count": 28
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"movies_sparkdf.write.option(\"header\",\"true\").mode(\"OVERWRITE\").csv('abfss://rawteam4@adls2team4.dfs.core.windows.net/conformed/Movies')"
+				],
+				"execution_count": 29
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					""
+				]
+			}
+		]
+	}
+}

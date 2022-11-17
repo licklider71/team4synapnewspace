@@ -1,0 +1,24 @@
+{
+	"name": "SouthridgeMovies",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "team4synapsewspace-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "southridge/movies",
+				"fileSystem": "rawteam4"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"quoteChar": "\"",
+			"firstRowAsHeader": true
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

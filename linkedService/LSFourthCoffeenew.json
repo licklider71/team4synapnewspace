@@ -1,0 +1,17 @@
+{
+	"name": "LSFourthCoffeenew",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "FileServer",
+		"typeProperties": {
+			"host": "\\\\FourthCoffee\\CDrive",
+			"userId": "southridge",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJiNjU5NDUzZi1lNTc2LTQ3ZWUtYTNkOC04MTJhZTU2MjgwMjkiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "IR-SHIR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
